@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 615501dbe4f3fe94fbf4b564abb10237, type: 3}
+  m_Name: ModConfig
+  m_EditorClassIdentifier: 
+  id: colorCyclebutton
+  title: Color-Cycle Button
+  author: wow its a logan
+  description: "\"That's all there is to it. Just a color-cycled button.\"\n\nmodulelID:
+    colorCyclebutton\n\nNice, it's my first module.\n\nThank you to all of the amazing
+    people over at the KTANE Discord Server that helped me bring this idea to life!\n\n(If
+    you find any bugs or issues, it's probably because Logan is bad at modding. Ping
+    wow its a logan\r#7413 on the KTANE Discord Server and I'll try to respond ASAP)"
+  version: 1.0
+  outputFolder: build
+  previewImage: {fileID: 2800000, guid: 1819c809dfcd31743a3ead1644cb6233, type: 3}
