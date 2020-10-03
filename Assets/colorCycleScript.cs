@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +23,18 @@ public class colorCycleScript : MonoBehaviour {
 
     static int _moduleIdCounter = 1;
     int _moduleID = 0;
+    
+    private Dictionary<string, int> ColorIndexes = new Dictionary<string, int>()
+    {
+		{"RED", 0},
+		{"GREEN", 1},
+		{"BLUE", 2},
+		{"CYAN", 3},
+		{"YELLOW", 4},
+		{"MAGENTA", 5},
+		{"WHITE", 6},
+		{"BLACK", 7}
+	};
 
     void Awake()
     {
@@ -142,12 +154,48 @@ public class colorCycleScript : MonoBehaviour {
                 Debug.LogFormat("[Color-Cycle Button #{0}] The timer did not contain a {1} in any position. Strike!", _moduleID, TargetTime);
             }
         }
-
-     
-
     }
 
+	#pragma warning disable 414
+	public string TwitchHelpMessage = "Use '!{0} <color> <digit>' to submit a color at the given digit!";
+	#pragma warning restore 414
+	IEnumerator ProcessTwitchCommand(string command)
+	{
+		string[] c = command.ToUpperInvariant().Split(' ');
+		if(c.Length < 2)
+		{
+			yield return null;
+			yield return "sendtochaterror Not enough arguments!";
+			yield break;
+		}
+		int ind = -1;
+		int time = -1;
+		bool success = false;
+		if(!int.TryParse(c[1], out time) || time < 0 || time > 9)
+		{
+			yield return null;
+			yield return "sendtochaterror Invalid time!";
+			yield break;
+		}
+		try
+		{
+			ind = ColorIndexes[c[0]];
+			success = true;
+		}
+		catch {}
+		if(!success)
+		{
+			yield return null;
+			yield return "sendtochaterror Invalid color!";
+			yield break;
+		}
+		while(Index!=ind)
+		{
+			Buttons[1].OnInteract();
+			yield return new WaitForSeconds(.1f);
+		}
+		while(!BombInfo.GetFormattedTime().Contains(time.ToString())) yield return null;
+		Buttons[2].OnInteract();
+	}
+
 }
-
-
-
