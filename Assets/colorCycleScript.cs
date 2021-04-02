@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using KModkit;
-using Rnd = UnityEngine.Random;
-
+using System.Text.RegularExpressions;
 //thank you Obvious for helping me make this, and by that I mean telling everything I need to put in to make the module work
 
 public class colorCycleScript : MonoBehaviour {
@@ -125,8 +124,6 @@ public class colorCycleScript : MonoBehaviour {
             Debug.LogFormat("[Color-Cycle Button #{0}] You selected {1} as your color. That is CORRECT.", _moduleID, colornames[Index], colornames[TargetIndex]);
             Debug.LogFormat("[Color-Cycle Button #{0}] You submitted when the timer had a {1} in any position. That is CORRECT.", _moduleID, TargetTime);
             Debug.LogFormat("[Color-Cycle Button #{0}] Module Solved!", _moduleID);
-
-
         }
         else
         {
@@ -142,9 +139,47 @@ public class colorCycleScript : MonoBehaviour {
                 Debug.LogFormat("[Color-Cycle Button #{0}] The timer did not contain a {1} in any position. Strike!", _moduleID, TargetTime);
             }
         }
+    }
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"Use !{0} submit red 5 to turn the button red, and then press submit when the last digit of the timer is 5.";
+#pragma warning restore 414
 
-     
-
+    IEnumerator ProcessTwitchCommand(string input)
+    {
+        string[] colornames = { "RED", "GREEN", "BLUE", "CYAN", "YELLOW", "MAGENTA", "WHITE", "BLACK" };
+        string[] digits = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+        string command = input.Trim().ToUpperInvariant();
+        List<string> parameters = command.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+        if (parameters.Count == 3 && parameters[0] == "SUBMIT" && colornames.Contains(parameters[1]) && digits.Contains(parameters[2]))
+        {
+            yield return null;
+            int colorIndex = Array.IndexOf(colornames, parameters[1]);
+            int submitDigit = int.Parse(parameters[2]);
+            KMSelectable buttonToPress = (Math.Abs(TargetIndex - colorIndex) > 4) ? Buttons[0] : Buttons[1];
+            while (Index != colorIndex)
+            {
+                buttonToPress.OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+            while ((int)BombInfo.GetTime() % 10 == submitDigit) yield return "trycancel"; //Fixes a really obscure bug with tp
+            while ((int)BombInfo.GetTime() % 10 != submitDigit) yield return "trycancel";
+            Buttons[2].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+        else yield return "sendtochaterror";
+    }
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        int startPos = Index;
+        KMSelectable buttonToPress = (Math.Abs(TargetIndex - startPos) > 4) ? Buttons[0] : Buttons[1];
+        while (Index != TargetIndex)
+        {
+            buttonToPress.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+        while ((int)BombInfo.GetTime() % 10 != TargetTime) yield return true;
+        Buttons[2].OnInteract();
+        yield return new WaitForSeconds(0.1f);
     }
 
 }
